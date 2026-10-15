@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script>
+  (function() {
+    var GA_ID = 'G-0HB0P788F3';
+    var isLocalDev = ['localhost', '127.0.0.1', ''].includes(location.hostname);
+    if (isLocalDev) return;
+    try { if (/[?&]no_ga=0/.test(location.search)) localStorage.removeItem('no_ga'); if (/[?&]no_ga=1/.test(location.search)) localStorage.setItem('no_ga', '1'); if (localStorage.getItem('no_ga') === '1') return; } catch (e) {}
+    var gaQ = new URLSearchParams(location.search); if (gaQ.get('obs') === '1' || gaQ.get('no_ga') === '1') return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+    document.addEventListener('click', function(e) {
+      var a = e.target && e.target.closest ? e.target.closest('a[href*="booth.pm"]') : null;
+      if (!a) return;
+      gtag('event', 'booth_click', { link_url: a.href, link_id: a.id || '', link_text: (a.textContent || '').trim().slice(0, 40) });
+    });
+  })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="小説・SS・短歌・俳句を、文庫風の縦書き画像にする無料メーカー。貼るだけでルビ(ふりがな)・傍点・縦中横・句読点のぶら下げに対応し、長い文章は自動でページ分け。Xやインスタ向けの4:5・正方形・9:16で保存。登録不要、文章は送信しません。">
+<link rel="canonical" href="https://uuhai0625.github.io/tategaki-gazou/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="縦書き画像メーカー|小説・SS・短歌を文庫風の縦書き画像に(無料)">
+<meta property="og:description" content="小説・SS・短歌・俳句を、文庫風の縦書き画像にする無料メーカー。貼るだけでルビ(ふりがな)・傍点・縦中横・句読点のぶら下げに対応し、長い文章は自動でページ分け。Xやインスタ向けの4:5・正方形・9:16で保存。登録不要、文章は送信しません。">
+<meta property="og:url" content="https://uuhai0625.github.io/tategaki-gazou/">
+<meta property="og:image" content="https://uuhai0625.github.io/tategaki-gazou/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>縦書き画像メーカー|小説・SS・短歌を文庫風の縦書き画像に(無料)</title>
+<style>
+  :root {
+    --bg: #f4f3ef;
+    --panel: #ffffff;
+    --border: #dedad0;
+    --field-border: #625d52;
+    --text: #23211c;
+    --muted: #595448;
+    --accent: #2f4a6b;
+    --accent-dark: #22364f;
+    --soft: #e8eef5;
+    --ng: #b3261e;
+    --locked: #cbc5b6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  header { background: var(--accent-dark); color: #fff; padding: 24px 20px 18px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.35rem; }
+  header p { margin: 0; font-size: .9rem; }
+  main { max-width: 1120px; margin: 0 auto; padding: 22px 16px 50px; }
+  main > * { min-width: 0; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "txt pv" "set pv"; column-gap: 18px; align-items: start; }
+  .layout > * { min-width: 0; }
+  #txt-card { grid-area: txt; } #set-card { grid-area: set; }
+  #pv-card { grid-area: pv; position: sticky; top: 12px; }
+  section.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+  section.card h2 { margin: 0 0 6px; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .desc { color: var(--muted); font-size: .84rem; margin: 0 0 12px; }
+  .fine { color: var(--muted); font-size: .8rem; margin: 8px 0 0; }
+  .badge { display: inline-block; font-size: .7rem; padding: 2px 8px; border-radius: 999px; background: #fff1cc; color: #7a5600; font-weight: bold; }
+  .hidden { display: none !important; }
+  label.field, div.field { display: block; margin-bottom: 12px; }
+  .lbl { font-size: .85rem; font-weight: bold; display: block; }
+  .hint { font-size: .78rem; color: var(--muted); font-weight: normal; display: block; margin-top: 2px; }
+  select, input[type=text], textarea { margin-top: 5px; min-height: 44px; border: 1px solid var(--field-border); border-radius: 8px; font-size: 1rem; font-family: inherit; background: #fff; color: var(--text); width: 100%; padding: 8px 10px; }
+  input[type=color] { margin-top: 5px; min-height: 44px; width: 100%; border: 1px solid var(--field-border); border-radius: 8px; background: #fff; }
+  textarea { min-height: 220px; resize: vertical; line-height: 1.6; }
+  input[type=range] { width: 100%; min-height: 36px; accent-color: var(--accent); }
+  .row2 { display: flex; gap: 12px; }
+  .row2 > * { flex: 1; min-width: 0; }
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn { min-height: 44px; min-width: 44px; padding: 9px 16px; border-radius: 8px; font-size: .88rem; cursor: pointer; border: 1px solid var(--field-border); background: #fff; color: var(--text); font-family: inherit; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+  .btn.small { min-height: 44px; padding: 6px 12px; font-size: .82rem; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-dark); outline-offset: 2px; }
+  .btn-row .btn { flex: 1; }
+  .status { font-size: .82rem; color: var(--muted); margin-top: 6px; min-height: 1.2em; }
+  .status.err { color: var(--ng); font-weight: bold; }
+  .pv { border: 1px solid var(--border); border-radius: 8px; background: #e6e3da; padding: 10px; display: flex; justify-content: center; }
+  .pv canvas { max-width: 100%; max-height: max(300px, calc(100vh - 340px)); width: auto; height: auto; display: block; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
+  .pager { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 8px; }
+  .pager span { font-size: .86rem; font-weight: bold; min-width: 7em; text-align: center; }
+  .sum { font-size: .84rem; margin: 0 0 4px; font-weight: bold; color: var(--accent-dark); }
+  .limit { font-size: .8rem; margin: 0 0 8px; color: var(--muted); min-height: 1.2em; }
+  .guide { font-size: .88rem; }
+  .guide h3 { font-size: .95rem; margin: 14px 0 4px; }
+  .guide ul, .guide ol { padding-left: 1.3em; margin: 6px 0; }
+  .guide li { margin: 4px 0; }
+  .guide code { background: #f0eee8; padding: 1px 5px; border-radius: 4px; font-size: .86em; }
+  .locked-panel { border: 1px dashed var(--locked); border-radius: 10px; padding: 16px; text-align: center; color: var(--muted); background: #fbfaf7; }
+  .locked-panel .lead { color: var(--text); font-weight: bold; }
+  .locked-panel .feat-list { text-align: left; max-width: 620px; margin: 10px auto; font-size: .85rem; padding-left: 1.2em; }
+  .buy-btn { display: inline-block; margin-top: 8px; background: var(--accent-dark); color: #fff; font-weight: bold; padding: 11px 22px; border-radius: 999px; text-decoration: none; font-size: .9rem; }
+  footer { max-width: 1120px; margin: 0 auto; padding: 0 16px 40px; font-size: .8rem; color: var(--muted); }
+  footer a { color: var(--muted); }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "txt" "set" "pv"; }
+    #pv-card { position: static; }
+    .pv canvas { max-height: 60vh; }
+  }
+  @media (max-width: 600px) {
+    .row2 { flex-direction: column; gap: 0; }
+    section.card { padding: 16px 12px; }
+  }
+</style>
+<!--ANSHIN_CSS_START--><style>:root{--anshin-w:1088px;--anshin-pad:16px}.anshin-strip,.anshin{box-sizing:border-box;width:min(var(--anshin-w),calc(100% - 2 * var(--anshin-pad)));margin-left:auto;margin-right:auto}.anshin-strip{list-style:none;margin-top:10px;margin-bottom:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.8rem;line-height:1.5}.anshin-strip li{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border:1px solid rgba(20,120,90,.45);border-radius:999px;background:rgba(20,120,90,.07)}.anshin-strip li.anshin-more{border:0;background:none;padding:3px 2px}.anshin-strip a,.anshin a{color:inherit}.anshin{margin-top:18px;margin-bottom:18px;padding:14px 18px;border:1px solid rgba(20,120,90,.45);border-radius:10px;background:rgba(20,120,90,.05);font-size:.86rem;line-height:1.7}.anshin h2{font-size:1rem;margin:0 0 6px}.anshin p{margin:0 0 6px}.anshin ul{margin:0;padding-left:1.2em}.anshin li{margin:3px 0}.anshin details{margin-top:6px}.anshin summary{cursor:pointer;font-weight:bold}.anshin .anshin-meta{margin:8px 0 0;font-size:.8rem;opacity:.85}@media print{.anshin,.anshin-strip{display:none!important}}</style><!--ANSHIN_CSS_END-->
+<!--UPSELL_CSS_START--><style>.upsell-top{box-sizing:border-box;width:min(var(--anshin-w,880px),calc(100% - 2 * var(--anshin-pad,16px)));margin:12px auto 0;font-size:.85rem;line-height:1.6}.upsell-top a{color:inherit}.upsell-assure{list-style:none;margin:12px 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:6px 8px;font-size:.8rem;line-height:1.5}.upsell-assure li{padding:3px 10px;border:1px solid rgba(20,120,90,.45);border-radius:12px;background:rgba(20,120,90,.06)}.upsell-terms{margin:8px 0 0;font-size:.78rem;line-height:1.6;opacity:.85}.upsell-toast{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:9999;box-sizing:border-box;width:min(520px,calc(100% - 24px));padding:14px 56px 14px 16px;border-radius:12px;background:#fff;color:#222;border:1px solid #c9c2d6;box-shadow:0 6px 24px rgba(0,0,0,.18);font-size:.88rem;line-height:1.6}.upsell-toast p{margin:0 0 6px;font-weight:bold}.upsell-toast ul{margin:0 0 10px;padding-left:1.2em}.upsell-toast li{margin:2px 0}.upsell-toast .upsell-note{display:block;margin-top:6px;font-size:.75rem;color:#555}.upsell-toast .upsell-go{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:8px;background:#c9283e;color:#fff;font-weight:bold;text-decoration:none}.upsell-toast .upsell-go:focus-visible,.upsell-toast .upsell-x:focus-visible{outline:3px solid #2560c4;outline-offset:2px}.upsell-toast .upsell-x{position:absolute;top:4px;right:4px;width:44px;height:44px;border:0;border-radius:8px;background:transparent;color:#555;font-size:1.3rem;line-height:1;cursor:pointer}.upsell-inline{white-space:nowrap;color:inherit;text-decoration:underline;text-underline-offset:2px}@media print{.upsell-top,.upsell-assure,.upsell-terms,.upsell-toast,.upsell-inline{display:none!important}}</style><!--UPSELL_CSS_END-->
+</head>
+<body>
+
+<header>
+  <h1>縦書き画像メーカー(小説・SS・短歌)</h1>
+  <p>文章を貼るだけで、Xやインスタに載せやすい縦書きの画像に。ルビ(ふりがな)・傍点・縦中横・句読点のぶら下げに対応、長い文章はページに分けます。登録不要・スマホでも使えます</p>
+</header>
+<!--ANSHIN_STRIP_START-->
+<ul class="anshin-strip" aria-label="データの扱い">
+  <li><span aria-hidden="true">✓</span> 入力内容はこの端末の中だけで処理</li>
+  <li><span aria-hidden="true">✓</span> 登録・ログイン不要</li>
+  <li><span aria-hidden="true">✓</span> 仕組みを公開中</li>
+  <li class="anshin-more"><a href="#anshin">データの扱いをくわしく</a></li>
+</ul>
+<!--ANSHIN_STRIP_END-->
+<!--UPSELL_TOP_START--><p class="upsell-top no-print" id="upsellTop">このページは無料のまま使えます。機能を増やしたい方は <a href="#pro-section">買い切り版(¥100・1回払い)<span aria-hidden="true"> ↓</span></a></p><!--UPSELL_TOP_END-->
+
+<main>
+<div class="layout">
+
+  <section class="card" id="txt-card">
+    <h2>① 文章</h2>
+    <label class="field"><span class="lbl">本文</span>
+      <textarea id="inText" aria-describedby="txtHint"></textarea>
+      <span class="hint" id="txtHint">ルビは <code>|漢字《かんじ》</code> の形で書きます(「|」を省くと、直前の漢字すべてにかかります)。傍点は <code>《《文字》》</code>。段落の頭の字下げは、全角スペースを入れてください</span>
+    </label>
+    <div class="row2">
+      <label class="field"><span class="lbl">タイトル(なくてもOK)</span><input type="text" id="inTitle" maxlength="60"></label>
+      <label class="field"><span class="lbl">名前(なくてもOK)</span><input type="text" id="inAuthor" maxlength="40"></label>
+    </div>
+  </section>
+
+  <section class="card" id="set-card">
+    <h2>② 見た目</h2>
+    <div class="row2">
+      <label class="field"><span class="lbl">デザイン</span>
+        <select id="inTheme">
+          <option value="bunko" selected>文庫(クリーム色の紙)</option>
+          <option value="white">白い紙</option>
+          <option value="night">夜(紺に白い文字)</option>
+          
+        </select>
+      </label>
+      <label class="field"><span class="lbl">画像の形</span>
+        <select id="inSize">
+          <option value="45" selected>縦長 4:5(1080×1350・X/インスタ)</option>
+          <option value="34">縦長 3:4(1080×1440)</option>
+          <option value="11">正方形(1080×1080)</option>
+          <option value="916">縦長 9:16(1080×1920・ストーリーズ)</option>
+        </select>
+      </label>
+    </div>
+    
+    <div class="row2">
+      <label class="field"><span class="lbl">書体</span>
+        <select id="inFont">
+          <option value="mincho" selected>明朝(本のような書体)</option>
+          <option value="gothic">ゴシック</option>
+        </select>
+      </label>
+      <label class="field"><span class="lbl">並べ方</span>
+        <select id="inAlign">
+          <option value="top" selected>本文(右上から)</option>
+          <option value="center">まん中(短歌・俳句・ひとこと)</option>
+        </select>
+      </label>
+    </div>
+    <div class="row2">
+      <div class="field" id="charsField"><label class="lbl" for="inChars">1行の文字数 <span id="charsVal"></span></label>
+        <input type="range" id="inChars" min="10" max="40" step="1" value="22" aria-describedby="charsHint">
+        <span class="hint" id="charsHint"></span>
+      </div>
+      <label class="field"><span class="lbl">行の間</span>
+        <select id="inGap">
+          <option value="1.55">せまい</option>
+          <option value="1.8" selected>ふつう</option>
+          <option value="2.1">ひろい</option>
+        </select>
+      </label>
+    </div>
+    <p class="fine" id="setHint"></p>
+  </section>
+
+  <section class="card" id="pv-card">
+    <h2>見本</h2>
+    <p class="sum" id="sum"></p>
+    <p class="limit" id="limitNote"></p>
+    <div class="pv"><canvas id="cv" width="540" height="675" role="img" aria-label="縦書き画像の見本"></canvas></div>
+    <div class="pager" id="pager">
+      <button type="button" class="btn small" id="prevBtn" aria-label="前のページ">◀</button>
+      <span id="pageNo" aria-live="polite">1 / 1</span>
+      <button type="button" class="btn small" id="nextBtn" aria-label="次のページ">▶</button>
+    </div>
+    <div class="status" id="outSt" role="status"></div>
+    <div class="btn-row">
+      <button type="button" class="btn primary" id="shareBtn">まとめて保存・共有</button>
+      <button type="button" class="btn" id="saveBtn">このページだけ保存</button>
+      
+    </div>
+    <p class="fine">スマホは「まとめて保存・共有」→「画像を保存」で写真に入ります。Xは1回の投稿に画像4枚までです。</p>
+  </section>
+
+</div>
+
+  <section class="card" id="pro-section">
+    <h2>パソコンでZIP保存・原稿用紙・好きな色の紙 <span class="badge">買い切り版 ¥100(税込)</span></h2>
+    <div class="locked-panel">
+      <p class="lead">パソコンで、ネットにつながっていなくても縦書きの画像に。</p>
+      <p>このページの機能は無料でそのまま使えます。買い切り版(ダウンロード購入)では、次の機能が増えます:</p>
+      <ul class="feat-list">
+        <li><strong>ZIPでまとめて保存</strong>: ページ番号つきのファイル名で全部保存</li>
+        <li><strong>デザインが2つ増えます</strong>: 原稿用紙(20字)・好きな色の紙</li>
+        <li><strong>100ページまで</strong>(無料版は4ページまで)</li>
+        <li><strong>画像にツール名が入りません</strong></li>
+        <li><strong>パソコンで使うHTMLファイルです</strong>(スマホでの動作は保証していません)。ダブルクリックで開くだけ、ネットにつながっていなくても使えます</li>
+      </ul>
+<!--UPSELL_ASSURE_START--><ul class="upsell-assure" aria-label="買い切り版について"><li>¥100(税込)の1回払い・月額なし</li><li>パソコン向けのHTMLファイル(スマホでは開けない機種あり)</li><li>ネットにつながっていなくても動く</li><li>BOOTHで購入(クレジットカード・楽天ペイは手数料なし、コンビニ・銀行払いは別途手数料)</li></ul><!--UPSELL_ASSURE_END-->
+      <a class="buy-btn" href="https://uuhai0625.booth.pm/items/8995284" id="buyLink" target="_blank" rel="noopener">パソコン用の買い切り版を見る(BOOTH・新しいタブ)</a><!--UPSELL_TERMS_START--><p class="upsell-terms">販売者の情報・返品などの販売条件は、BOOTHの商品ページでご確認ください。BOOTHでの購入にはpixivのアカウントが必要です。</p><!--UPSELL_TERMS_END-->
+    </div>
+  </section>
+
+  <section class="card guide" id="guide">
+    <h2>小説・SS・短歌を縦書きの画像にする方法</h2>
+    <ol>
+      <li>①に文章を貼ります。タイトルと名前を入れると、1ページ目の右に入ります。</li>
+      <li>②でデザイン・画像の形・1行の文字数を選びます。短歌や俳句、ひとことは「まん中」にすると、ページのまん中にそろいます。</li>
+      <li>見本でページを確かめて保存します。長い文章は、文庫のページのように自動で分かれます。</li>
+    </ol>
+    <h3>使える書き方</h3>
+    <ul>
+      <li><strong>ルビ(ふりがな)</strong>: <code>|黄昏《たそがれ》</code> のように書きます。「|」を省いた <code>黄昏《たそがれ》</code> は、直前に続く漢字すべてにかかります。<code>[[rb:黄昏 &gt; たそがれ]]</code> の形も使えます。《》をそのまま出したいときは <code>|《</code> と書きます。</li>
+      <li><strong>傍点</strong>: <code>《《ここだけ》》</code> と書くと、文字の横に点が付きます。</li>
+      <li><strong>縦中横</strong>: 半角の1〜2けたの数字(例: 12)と「!!」「!?」は、縦の中に横向きで1文字ぶんに入ります。3けた以上の数字や英単語は横に寝かせて並べます(年などは漢数字や全角数字にすると縦に並びます)。</li>
+      <li><strong>句読点とかっこ</strong>: 行の頭に「、」「。」が来るときは、行の下にはみ出させて(ぶら下げ)並べます。閉じかっこや「……」は、前の字と一緒に次の行へ送ります(原稿用紙ではぶら下げません)。</li>
+      <li><strong>改行</strong>: 改行した所で次の行に移ります。空の行を入れると、1行あきます。</li>
+    </ul>
+    <h3>よくある質問</h3>
+    <ul>
+      <li><strong>書体が思っていたのと違う?</strong> 書体はお使いの端末に入っているものを使います(Windowsは游明朝、iPhone・Macはヒラギノ明朝など)。Androidは機種によって明朝体が入っておらず、ゴシックに近い見た目になることがあります。画像を商用で使う場合は、その書体の利用条件もご確認ください。</li>
+      <li><strong>文章はどこかに送られる?</strong> 送られません。画像づくりは、このブラウザの中だけで行います。</li>
+      <li><strong>他の人の小説や歌詞を画像にしていい?</strong> 自分で書いた文章なら自由に使えます。他の人の小説・セリフ・短歌・歌詞を画像にしてSNSに載せるには、原則として作者や権利者の許可が必要です(短い引用でも「引用」のルールを守る必要があり、歌詞を画像にして載せるのは引用にあたらないことが多いです)。SNSが音楽の権利団体と結んでいる許諾は、歌詞の画像まで含むとは限りません。二次創作も、元の作品の権利者のルールを確かめてください。</li>
+    </ul>
+  </section>
+
+</main>
+
+<!--ANSHIN_START-->
+<section class="anshin" id="anshin" aria-labelledby="anshin-title">
+  <h2 id="anshin-title">データの扱いについて</h2>
+  <p>このページには、入力した内容を受け取る仕組みがありません。入力した文字や数字は、あなたのスマホやパソコンの中だけで処理されます。</p>
+  <ul>
+    <li>会員登録・ログイン・メールアドレスの入力はありません。</li>
+    <li>自分で確かめたい方へ: ページを開いたあと機内モードにしても、そのまま使えます。</li>
+  </ul>
+  <details>
+    <summary>もっとくわしく(保存・アクセス解析・公開について)</summary>
+    <ul>
+      <li>保存されるデータは、この端末のこのブラウザの中にだけ残ります(localStorage・sessionStorage)。共用のパソコンでは使い終わったら消してください。</li>
+      <li>アクセス解析(Google Analytics)のため、見たページのURL・参照元・端末やブラウザの種類・おおよその地域(IPアドレスから推定)・Cookieの識別子・BOOTHへのリンクのクリック・どのボタンを押したか(回数や選んだ設定を含む)がGoogleに送られます。目的は利用状況の把握です。入力した文字や画像は送りません。(<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleによるデータの使用</a>/<a href="https://tools.google.com/dlpage/gaoptout?hl=ja" target="_blank" rel="noopener">計測を止めるアドオン</a>。止めてもツールはそのまま使えます)</li>
+      <li>このツールの結果や作成物は目安です。入稿・契約・販売などの前には、印刷所や公式の情報でご確認ください。</li>
+      <li>処理の中身はすべて公開しています(詳しい方向け: <a href="https://github.com/uuhai0625/tategaki-gazou" target="_blank" rel="noopener">GitHub</a>)。</li>
+    </ul>
+  </details>
+  <p class="anshin-meta">作っている人: ウーハイ(個人開発)/不具合・ご質問は<a href="https://x.com/uuhai0625" target="_blank" rel="noopener">X(@uuhai0625)</a>へ/<a href="https://uuhai0625.github.io/" target="_blank" rel="noopener">ほかのツール</a>/この説明の更新日: 2026-10-13</p>
+</section>
+<!--ANSHIN_END-->
+
+<footer>
+  <p id="privacyNote">本ツールは完全にブラウザ内で動作し、入力した文章はどこにも送信されません。</p>
+  <p><a href="https://uuhai0625.booth.pm/" target="_blank" rel="noopener">他のツールも見る(BOOTHショップ)</a></p>
+  <p>不具合・ご要望は X <a href="https://x.com/uuhai0625" target="_blank" rel="noopener">@uuhai0625</a> まで。</p>
+  <p class="related-tools no-print">関連する無料ツール: <a href="https://uuhai0625.github.io/genko-page-calc/" target="_blank" rel="noopener">小説ページ数計算</a> ・ <a href="https://uuhai0625.github.io/doujin-okuzuke-maker/" target="_blank" rel="noopener">奥付メーカー</a> ・ <a href="https://uuhai0625.github.io/bunkatsu-toukou/" target="_blank" rel="noopener">分割投稿メーカー</a> ・ <a href="https://uuhai0625.github.io/#free-tools">ツール一覧</a></p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var EDITION = "free"; // "full" で買い切り完全版
+
+  function track(name, params) {
+    if (!window.dataLayer) return;
+    (function () { window.dataLayer.push(arguments); })("event", name, params || {});
+  }
+  var $ = function (id) { return document.getElementById(id); };
+  function setSt(id, msg, err) { var e = $(id); if (!e) return; e.textContent = msg; e.classList.toggle("err", !!err); }
+
+  var MAX_PAGES = 4, CREDIT = true;
+  var MAX_TEXT = 100000, SHARE_MAX = 10;
+  var SIZES = { "45": [1080, 1350], "34": [1080, 1440], "11": [1080, 1080], "916": [1080, 1920] };
+  var THEMES = {
+    bunko: { bg: "#f6f0e1", ink: "#2a251e", sub: "#7a7062" },
+    white: { bg: "#ffffff", ink: "#1c1c1c", sub: "#777777" },
+    night: { bg: "#1d2535", ink: "#ece7da", sub: "#9aa3b5" }
+  };
+  
+  var FONTS = {
+    mincho: '"Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Noto Serif JP", "Noto Serif CJK JP", "MS PMincho", serif',
+    gothic: '"Yu Gothic", "YuGothic", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Noto Sans CJK JP", "Meiryo", sans-serif'
+  };
+  var SAMPLE = "　窓の外で、雨が|止《や》んだ。\n　「行こうか」と彼女は言った。傘はもう、《《いらなかった》》。\n\n　駅までの道は、水たまりに|黄昏《たそがれ》の色を映していた。12月のはじめの、少しだけ暖かい夕方だった。";
+
+  // ===== 文字の種類(UAX #50・JLREQを参考) =====
+  var ROT = "ー―‐－～〜…‥（）〔〕［］｛｝〈〉《》「」『』【】〘〙〖〗＜＞＝→←⇒⇔—–−─━〰：；";
+  var DASH = "―—─━";
+  var PUNCT = "、。，．";
+  var SMALL = "ぁぃぅぇぉっゃゅょゎゕゖァィゥェォッャュョヮヵヶㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿ";
+  var NO_START = "、。，．」』）〕］｝〉》】〙〗｠»〟”’！？‼⁇⁈⁉ー―—…‥・：；ヽヾゝゞ々〻ぁぃぅぇぉっゃゅょゎゕゖァィゥェォッャュョヮヵヶㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿ〜～゠";
+  var HANG = "、。，．";
+  var NO_END = "「『（〔［｛〈《【〘〖｟«〝“‘";
+  var HAN = /^(?:\p{Script=Han}|[々〆〇ヶ])+$/u;
+
+  var segmenter = (typeof Intl !== "undefined" && Intl.Segmenter) ? new Intl.Segmenter("ja", { granularity: "grapheme" }) : null;
+  function graphemes(str) { return segmenter ? Array.from(segmenter.segment(str), function (x) { return x.segment; }) : Array.from(str); }
+  function first(s) { return Array.from(s)[0] || ""; }
+  function classify(g) {
+    if (DASH.indexOf(g) >= 0) return "dash";
+    if (ROT.indexOf(g) >= 0) return "rot1";
+    if (PUNCT.indexOf(g) >= 0) return "punct";
+    if (SMALL.indexOf(g) >= 0) return "small";
+    return "n";
+  }
+
+  // ===== 文章 → 1文字ずつのマス(ルビ・傍点・縦中横・横向きの英数字) =====
+  var measureCtx = document.createElement("canvas").getContext("2d");
+  function parse(text, font) {
+    var cells = [], rubies = [];
+    measureCtx.font = "100px " + font;
+    function pushGraphemes(str, dot) {
+      graphemes(str).forEach(function (g) {
+        if (g === " ") cells.push({ s: " ", k: "sp", adv: 0.5 });
+        else if (g === "　") cells.push({ s: "　", k: "sp", adv: 1, dot: dot });
+        else cells.push({ s: g, k: classify(g), adv: 1, dot: dot });
+      });
+    }
+    function pushPlain(str, dot) {
+      str = str.replace(/[｡-ﾟ]+/g, function (m) { return m.normalize("NFKC"); });
+      var re = /[!?！？]{2,}|[\x21-\x7e]+|\n/g, last = 0, m;
+      while ((m = re.exec(str))) {
+        pushGraphemes(str.slice(last, m.index), dot);
+        var t = m[0];
+        if (t === "\n") cells.push({ nl: true });
+        else if (/^[!?！？]+$/.test(t)) {
+          var h = t.replace(/！/g, "!").replace(/？/g, "?");
+          for (var i = 0; i < h.length; i += 2) {
+            var p = h.slice(i, i + 2);
+            if (p.length === 2) cells.push({ s: p, k: "tcy", adv: 1, dot: dot });
+            else cells.push({ s: p === "!" ? "！" : "？", k: "n", adv: 1, dot: dot });
+          }
+        } else if (/^[0-9]{1,2}$/.test(t)) cells.push({ s: t, k: "tcy", adv: 1, dot: dot });
+        else if (t === "!" || t === "?") cells.push({ s: t === "!" ? "！" : "？", k: "n", adv: 1, dot: dot });
+        else cells.push({ s: t, k: "rot", adv: Math.max(0.5, measureCtx.measureText(t).width / 100 + 0.1), dot: dot });
+        last = re.lastIndex;
+      }
+      pushGraphemes(str.slice(last), dot);
+    }
+    function pushRuby(base, ruby) {
+      var start = cells.length;
+      pushPlain(base, false);
+      if (cells.length > start && ruby) rubies.push({ s: start, e: cells.length - 1, t: ruby });
+    }
+    // 傍点《《》》 / エスケープ|《 / [[rb:親 > るび]] / |親《るび》 / 漢字《るび》
+    var re = /《《([^》\n]{1,50})》》|[|｜]《|\[\[rb:([^\]>\n]{1,20}?)\s*>\s*([^\]\n]{1,30}?)\]\]|[|｜]([^|｜《\n]{1,20})《([^《》\n]{1,30})》|([^\x00-\x7e《》｜\n]{1,20}?)《([^《》\n]{1,30})》/gu, last = 0, m;
+    while ((m = re.exec(text))) {
+      var pre = text.slice(last, m.index);
+      if (m[6] !== undefined) {
+        // 漢字《るび》: 直前に続く漢字だけを親文字にする
+        var chars = Array.from(m[6]), k = chars.length;
+        while (k > 0 && HAN.test(chars[k - 1])) k--;
+        if (k === chars.length) { pushPlain(pre + m[0], false); last = re.lastIndex; continue; }
+        pushPlain(pre + chars.slice(0, k).join(""), false);
+        pushRuby(chars.slice(k).join(""), m[7]);
+      } else {
+        pushPlain(pre, false);
+        if (m[1] !== undefined) pushPlain(m[1], true);
+        else if (m[0].length === 2 && m[0][1] === "《") pushPlain("《", false);
+        else if (m[2] !== undefined) pushRuby(m[2].trim(), m[3].trim());
+        else pushRuby(m[4], m[5]);
+      }
+      last = re.lastIndex;
+    }
+    pushPlain(text.slice(last), false);
+    return { cells: cells, rubies: rubies };
+  }
+
+  // ===== 行に分ける(句読点のぶら下げ・追い出し・行末の開きかっこ・ルビを分けない) =====
+  function layout(P, N, grid) {
+    var cols = [], col = [], y = 0, cells = P.cells;
+    var adv = function (c) { return grid ? Math.max(1, Math.ceil(c.adv - 0.01)) : c.adv; };
+    var isNS = function (c) { return !!c && !c.nl && (c.k === "tcy" ? /^[!?]/.test(c.s) : NO_START.indexOf(first(c.s)) >= 0); };
+    var groupAt = function (i) { for (var g = 0; g < P.rubies.length; g++) { var r = P.rubies[g]; if (i >= r.s && i <= r.e) return r; } return null; };
+    function newCol() { cols.push(col); col = []; y = 0; }
+    for (var i = 0; i < cells.length; i++) {
+      var c = cells[i];
+      if (c.nl) { newCol(); continue; }
+      var a = adv(c);
+      // 1行に入らない長い英数字は分ける
+      if (a > N && (c.k === "rot") && c.s.length > 1) {
+        var per = Math.max(1, Math.floor(c.s.length * N / c.adv) - 1), parts = [];
+        for (var p = 0; p < c.s.length; p += per) { var sub = c.s.slice(p, p + per); parts.push({ s: sub, k: "rot", adv: Math.max(0.5, c.adv * sub.length / c.s.length), dot: c.dot }); }
+        cells.splice.apply(cells, [i, 1].concat(parts));
+        P.rubies.forEach(function (r) { if (r.s > i) { r.s += parts.length - 1; r.e += parts.length - 1; } else if (r.e >= i) r.e += parts.length - 1; });
+        c = cells[i]; a = adv(c);
+      }
+      // ルビの親文字は途中で行を変えない(1行に入る長さなら)
+      var r0 = null;
+      for (var g = 0; g < P.rubies.length; g++) if (P.rubies[g].s === i) r0 = P.rubies[g];
+      if (r0 && col.length) {
+        var len = 0; for (var k = r0.s; k <= r0.e; k++) len += adv(cells[k]);
+        if (y + len > N + 0.001 && len <= N) newCol();
+      }
+      if (y + a > N + 0.001 && col.length) {
+        if (!grid && HANG.indexOf(c.s) >= 0 && y <= N + 0.001 && !isNS(cells[i + 1])) {
+          col.push({ c: c, i: i, y: y }); y = Infinity; continue;
+        }
+        if (isNS(c) && y <= N + 0.001) {
+          // 追い出し: 行頭禁則の字・……・ルビの親文字は、前の字と一緒に次の行へ
+          var pull = [];
+          while (col.length > 1 && pull.length < 8) {
+            var last = col.pop(); pull.unshift(last);
+            var gr = groupAt(last.i);
+            if (gr && last.i > gr.s) continue;
+            if (isNS(last.c)) continue;
+            break;
+          }
+          newCol();
+          pull.forEach(function (it) { col.push({ c: it.c, i: it.i, y: y }); y += adv(it.c); });
+        } else newCol();
+      }
+      // 行末に開きかっこを残さない
+      if (NO_END.indexOf(first(c.s)) >= 0 && y > 0 && y + a > N - 1 + 0.001) newCol();
+      col.push({ c: c, i: i, y: y }); y += a;
+    }
+    if (col.length) cols.push(col);
+    return cols;
+  }
+
+  // ===== ページを組む =====
+  function themeOf(name) {
+    var T = THEMES[name] || THEMES.bunko;
+    
+    return T;
+  }
+  function settings() {
+    var size = SIZES[$("inSize").value] || SIZES["45"], theme = THEMES[$("inTheme").value] ? $("inTheme").value : "bunko";
+    var grid = theme === "genko", maxN = $("inSize").value === "11" ? 30 : 40;
+    return {
+      W: size[0], H: size[1], theme: theme, grid: grid, T: themeOf(theme),
+      font: FONTS[$("inFont").value] || FONTS.mincho,
+      N: grid ? 20 : Math.max(10, Math.min(maxN, +$("inChars").value || 22)),
+      gap: grid ? 1.5 : (+$("inGap").value || 1.8),
+      center: !grid && $("inAlign").value === "center"
+    };
+  }
+  function build() {
+    var S = settings();
+    var text = $("inText").value.replace(/\r\n?/g, "\n").slice(0, MAX_TEXT);
+    var title = $("inTitle").value.trim(), author = $("inAuthor").value.trim();
+    var mt = S.H * 0.09, mb = S.H * 0.09, ml = S.W * 0.08, mr = S.W * 0.08;
+    var colH = S.H - mt - mb, em = colH / S.N;
+    var perPage = Math.max(1, Math.floor((S.W - ml - mr) / (em * S.gap)));
+    var P = parse(text, S.font), cols = layout(P, S.N, S.grid);
+    var head = [], ts = S.grid ? 1 : 1.2;
+    if (title) { var PT = parse(title, S.font); layout(PT, Math.floor(S.N / ts), S.grid).forEach(function (c) { head.push({ items: c, P: PT, scale: ts, bold: true, head: "title" }); }); }
+    if (author) { var PA = parse(author, S.font); layout(PA, S.N, S.grid).forEach(function (c) { head.push({ items: c, P: PA, head: "name" }); }); }
+    if (head.length && !S.center) head.push({ items: [], head: "space" });
+    var all = head.concat(cols.map(function (c) { return { items: c, P: P }; }));
+    while (all.length && !all[all.length - 1].items.length) all.pop();
+    var pages = [];
+    for (var i = 0; i < all.length; i += perPage) pages.push(all.slice(i, i + perPage));
+    if (!pages.length) pages.push([]);
+    return { S: S, pages: pages, em: em, mt: mt, ml: ml, mr: mr, colH: colH, perPage: perPage, total: pages.length, allTotal: pages.length };
+  }
+
+  // ===== 描く =====
+  function drawCell(ctx, c, xc, ytop, em, fe, grid) {
+    var a = grid ? Math.max(1, Math.ceil(c.adv - 0.01)) : c.adv, yc = ytop + a * em / 2;
+    ctx.save();
+    if (c.k === "rot" || c.k === "rot1") {
+      ctx.translate(xc, yc); ctx.rotate(Math.PI / 2); ctx.fillText(c.s, 0, 0);
+    } else if (c.k === "dash") {
+      // ――は切れ目なくつながる1本の線にする
+      var lw = Math.max(1.5, fe * 0.06);
+      ctx.fillRect(xc - lw / 2, ytop, lw, a * em);
+    } else if (c.k === "tcy") {
+      var w = ctx.measureText(c.s).width, k = Math.min(1, em * 0.92 / w);
+      ctx.translate(xc, yc); ctx.scale(k, 1); ctx.fillText(c.s, 0, 0);
+    } else if (c.k === "punct") {
+      var sh = grid ? em * 0.3 : em * 0.5;
+      ctx.fillText(c.s, xc + sh, yc - sh);
+    } else if (c.k === "small") {
+      ctx.fillText(c.s, xc + em * 0.1, yc - em * 0.1);
+    } else if (c.k !== "sp") {
+      ctx.fillText(c.s, xc, yc);
+    }
+    ctx.restore();
+    if (c.dot && c.k !== "sp") {
+      ctx.beginPath(); ctx.arc(xc + em * 0.62, ytop + em * 0.5, Math.max(1.5, em * 0.07), 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  function colLen(col, grid) { var len = 0; col.items.forEach(function (it) { len = Math.max(len, it.y + (grid ? Math.max(1, Math.ceil(it.c.adv - 0.01)) : it.c.adv)); }); return len; }
+  function renderPage(B, pi, k) {
+    var S = B.S, T = S.T;
+    k = k || 1;
+    var cv = document.createElement("canvas"); cv.width = Math.round(S.W * k); cv.height = Math.round(S.H * k);
+    var ctx = cv.getContext("2d"); ctx.scale(k, k);
+    ctx.fillStyle = T.bg; ctx.fillRect(0, 0, S.W, S.H);
+    var page = B.pages[pi] || [], em = B.em, colW = em * S.gap;
+    var x0 = S.W - B.mr;
+    if (S.center) x0 = S.W / 2 + page.length * colW / 2;
+    if (S.grid) drawGrid(ctx, B, x0);
+    // まん中そろえ: 本文の行はいちばん長い行に合わせて、ひとかたまりで上下のまん中に
+    var bodyLen = 0;
+    page.forEach(function (col) { if (!col.head) bodyLen = Math.max(bodyLen, colLen(col, S.grid)); });
+    var yBody = B.mt + (B.colH - bodyLen * em) / 2;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    page.forEach(function (col, ci) {
+      var xc = x0 - colW * ci - colW / 2, sc = col.scale || 1, cem = em * sc, fe = cem * (S.grid ? 0.82 : 0.94);
+      var len = colLen(col, S.grid), yoff = B.mt;
+      if (S.center) {
+        if (!bodyLen) yoff = B.mt + (B.colH - len * cem) / 2;
+        else if (col.head === "name") yoff = yBody + bodyLen * em - len * cem;
+        else yoff = yBody;
+      } else if (col.head === "name") yoff = B.mt + B.colH - len * cem;
+      ctx.fillStyle = T.ink; ctx.font = (col.bold ? "700 " : "500 ") + fe + "px " + S.font;
+      col.items.forEach(function (it) { drawCell(ctx, it.c, xc, yoff + it.y * cem, cem, fe, S.grid); });
+      if (col.P) drawRuby(ctx, B, col, xc, yoff, cem);
+    });
+    ctx.fillStyle = T.sub; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    if (B.total > 1) { ctx.font = "500 " + Math.round(S.W * 0.026) + "px " + S.font; ctx.fillText(String(pi + 1), S.W / 2, S.H - B.mt * 0.45); }
+    if (CREDIT) {
+      ctx.font = "400 " + Math.round(S.W * 0.016) + "px sans-serif"; ctx.textAlign = "left";
+      ctx.fillText("縦書き画像メーカー", S.W * 0.04, S.H - B.mt * 0.45);
+    }
+    return cv;
+  }
+  function drawRuby(ctx, B, col, xc, yoff, cem) {
+    var S = B.S;
+    ctx.font = "500 " + (cem * 0.46) + "px " + S.font;
+    col.P.rubies.forEach(function (r) {
+      var its = col.items.filter(function (it) { return it.i >= r.s && it.i <= r.e; });
+      if (!its.length) return;
+      var chars = Array.from(r.t), G = r.e - r.s + 1;
+      var a0 = its[0].i - r.s, a1 = its[its.length - 1].i - r.s + 1;
+      if (its.length < G) chars = chars.slice(Math.floor(a0 * chars.length / G), Math.floor(a1 * chars.length / G));
+      if (!chars.length) return;
+      var ys = its[0].y, ye = its[its.length - 1].y + its[its.length - 1].c.adv;
+      var top = yoff + ys * cem, span = (ye - ys) * cem, rs = cem * 0.5, step = span / chars.length;
+      if (step < rs) { step = rs; top -= (rs * chars.length - span) / 2; }
+      top = Math.max(B.mt - cem * 0.3, Math.min(top, B.mt + B.colH - step * chars.length));
+      chars.forEach(function (ch, n) {
+        drawCell(ctx, { s: ch, k: classify(ch) === "dash" ? "rot1" : classify(ch), adv: 1 }, xc + cem * 0.74, top + step * n + (step - rs) / 2, rs, rs, false);
+      });
+    });
+  }
+  function drawGrid(ctx, B, x0) {
+    var S = B.S, em = B.em, colW = em * S.gap;
+    ctx.strokeStyle = S.T.grid; ctx.lineWidth = 2;
+    for (var ci = 0; ci < B.perPage; ci++) {
+      var xr = x0 - colW * ci - (colW - em) / 2;
+      for (var r = 0; r < S.N; r++) ctx.strokeRect(xr - em, B.mt + r * em, em, em);
+    }
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x0 - colW * B.perPage, B.mt - 8, colW * B.perPage, B.colH + 16);
+  }
+
+  // ===== 見本・ページ送り =====
+  var B = null, cv = $("cv"), timer = null, state = { page: 0 };
+  function isEmpty() { return !$("inText").value.trim() && !$("inTitle").value.trim() && !$("inAuthor").value.trim(); }
+  function refresh() {
+    B = build();
+    var all = B.total, overflow = all > MAX_PAGES;
+    if (overflow) { B.pages = B.pages.slice(0, MAX_PAGES); B.total = MAX_PAGES; }
+    if (state.page >= B.total) state.page = B.total - 1;
+    var small = renderPage(B, state.page, 0.5);
+    cv.width = small.width; cv.height = small.height; cv.getContext("2d").drawImage(small, 0, 0);
+    small.width = small.height = 0;
+    $("pageNo").textContent = (state.page + 1) + " / " + B.total + "ページ";
+    $("pager").classList.toggle("hidden", B.total <= 1);
+    $("prevBtn").disabled = state.page <= 0; $("nextBtn").disabled = state.page >= B.total - 1;
+    var empty = isEmpty();
+    $("saveBtn").disabled = empty; $("shareBtn").disabled = empty || B.total > SHARE_MAX;
+    
+    $("sum").textContent = (overflow ? "全" + all + "ページ中" + MAX_PAGES + "ページまで" : B.total + "ページ") + "・1行" + B.S.N + "字×" + B.perPage + "行";
+    $("limitNote").textContent = overflow ? "長い文章は" + MAX_PAGES + "ページ目までを画像にします(" + MAX_PAGES + "ページ目の途中で切れます)。" + (EDITION === "full" ? "" : "買い切り版は100ページまで作れます。") : "";
+    if (empty) setSt("outSt", "文章かタイトルを入れると保存できます。");
+    else if ($("outSt").textContent === "文章かタイトルを入れると保存できます。") setSt("outSt", "");
+    cv.setAttribute("aria-label", "縦書き画像の見本(" + (state.page + 1) + "/" + B.total + "ページ)");
+    $("charsField").classList.toggle("hidden", B.S.grid);
+    $("setHint").textContent = B.S.grid ? "原稿用紙は1行20字で並べます(句読点も1マス使います)。" : "";
+    var maxN = $("inSize").value === "11" ? 30 : 40;
+    $("inChars").max = maxN;
+    $("charsVal").textContent = B.S.N + "字";
+    $("inChars").setAttribute("aria-valuetext", B.S.N + "字");
+    $("charsHint").textContent = B.em < 32 ? "文字が小さめです。タイムラインでは読みにくいことがあります" : "";
+    
+  }
+  function later() { clearTimeout(timer); timer = setTimeout(refresh, 250); }
+  $("prevBtn").addEventListener("click", function () { if (state.page > 0) { state.page--; refresh(); } });
+  $("nextBtn").addEventListener("click", function () { if (B && state.page < B.total - 1) { state.page++; refresh(); } });
+  ["inText", "inTitle", "inAuthor"].forEach(function (id) { $(id).addEventListener("input", later); });
+  ["inTheme", "inSize", "inFont", "inAlign", "inGap"].forEach(function (id) { $(id).addEventListener("change", refresh); });
+  $("inChars").addEventListener("input", later);
+  
+
+  // ===== 保存 =====
+  function toBlob(c) { return new Promise(function (res) { c.toBlob(function (b) { res(b); }, "image/png"); }); }
+  function fileName(i, n) { return "縦書き_" + String(i + 1).padStart(Math.max(2, String(n).length), "0") + ".png"; }
+  function download(blob, name) {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }
+  function allBlobs(b) {
+    var out = [], i = 0;
+    return new Promise(function (resolve, reject) {
+      (function next() {
+        if (i >= b.total) { resolve(out); return; }
+        var c = renderPage(b, i, 1);
+        toBlob(c).then(function (blob) { c.width = c.height = 0; if (!blob) { reject(new Error("blob")); return; } out.push(blob); i++; next(); });
+      })();
+    });
+  }
+  // スマホの共有はボタンを押した直後に呼ぶ必要があるので、画像は先に作っておく
+  var shareCache = null, shareKey = "", cacheTimer = null, sharing = false;
+  var paperVal = function () { return ""; };
+  
+  function cacheKey() { return JSON.stringify([$("inText").value, $("inTitle").value, $("inAuthor").value, $("inTheme").value, $("inSize").value, $("inFont").value, $("inAlign").value, $("inChars").value, $("inGap").value, paperVal()]); }
+  function warmCache() {
+    clearTimeout(cacheTimer);
+    cacheTimer = setTimeout(function () {
+      if (!B || B.total > SHARE_MAX || isEmpty()) { shareCache = null; return; }
+      var key = cacheKey(), snap = B;
+      allBlobs(snap).then(function (blobs) { if (key === cacheKey()) { shareCache = blobs; shareKey = key; } }).catch(function () { shareCache = null; });
+    }, 900);
+  }
+  function invalidate() { shareCache = null; warmCache(); }
+  ["inText", "inTitle", "inAuthor"].forEach(function (id) { $(id).addEventListener("input", invalidate); });
+  ["inTheme", "inSize", "inFont", "inAlign", "inGap", "inChars"].forEach(function (id) { $(id).addEventListener("change", invalidate); });
+  
+
+  $("saveBtn").addEventListener("click", function () {
+    if (!B || isEmpty()) return;
+    var c = renderPage(B, state.page, 1), pg = state.page, n = B.total;
+    toBlob(c).then(function (b) {
+      c.width = c.height = 0;
+      if (!b) { setSt("outSt", "画像を作れませんでした。", true); return; }
+      download(b, fileName(pg, n));
+      setSt("outSt", (pg + 1) + "ページ目を保存しました。iPhoneでは「ファイル」に入ることがあります(写真に入れるには「まとめて保存・共有」が便利です)。");
+      track("tate_save", { via: "one", pages: n, theme: B.S.theme });
+    });
+  });
+  $("shareBtn").addEventListener("click", function () {
+    if (!B || sharing) return;
+    if (!shareCache || shareKey !== cacheKey()) { setSt("outSt", "画像を準備しています。少し待ってからもう一度押してください。"); invalidate(); return; }
+    var files = shareCache.map(function (b, i) { return new File([b], fileName(i, shareCache.length), { type: "image/png" }); });
+    if (!(navigator.canShare && navigator.canShare({ files: files }))) {
+      setSt("outSt", "この端末ではまとめて共有できません。「このページだけ保存」で1枚ずつ保存してください。", true);
+      return;
+    }
+    sharing = true;
+    navigator.share({ files: files }).then(function () {
+      setSt("outSt", "共有しました。写真に入っていなければ、もう一度押して「画像を保存」を選んでください。");
+      track("tate_save", { via: "share", pages: files.length, theme: B.S.theme });
+    }).catch(function (e) {
+      if (e && e.name === "AbortError") setSt("outSt", "共有をやめました。");
+      else setSt("outSt", "共有できませんでした。「このページだけ保存」で1枚ずつ保存してください。", true);
+    }).then(function () { sharing = false; });
+  });
+
+  var zipping = false;
+  
+
+  if (EDITION === "full") {
+    $("pro-section").classList.add("hidden");
+  }
+  if (EDITION !== "full") {
+    $("privacyNote").innerHTML = '入力した文章はどこにも送信されません(すべてこのブラウザの中で処理します)。このページでは利用状況の把握のためにアクセス解析(Google Analytics)を使っています。<a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Googleによるデータの使用について</a>';
+  }
+
+  $("inText").value = SAMPLE;
+  refresh(); warmCache();
+  // 書体の読み込みが遅れたときに描き直す
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { refresh(); invalidate(); });
+})();
+</script>
+<!--UPSELL_JS_START-->
+<script>
+(function () {
+  "use strict";
+  var q = new URLSearchParams(location.search);
+  if (q.get("obs") === "1" || document.documentElement.classList.contains("obs")) return;
+  // 小さな案内(トースト)は、買い切り版がパソコン向けなので、マウス操作の広い画面でだけ出す
+  var pc = !!(window.matchMedia && matchMedia("(pointer:fine) and (min-width:720px)").matches);
+  var buy = document.getElementById("buyLink");
+  var pro = document.getElementById("pro-section");
+  if (!buy || !pro) return;
+  var FEATS = [];
+  var path = location.pathname.replace(/index\.html$/, "");
+  var KEY_CLOSED = "upsell_closed_until:" + path, KEY_SHOWN = "upsell_shown:" + path;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function sess(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } }
+  function gtagEv(name, p) { if (!window.dataLayer) return; (function () { window.dataLayer.push(arguments); })("event", name, p || {}); }
+
+  var shown = false;
+  function blocked() {
+    if (shown || sess(KEY_SHOWN) === "1") return true;
+    var until = Number(store(KEY_CLOSED) || 0);
+    return until && Date.now() < until;
+  }
+  function feats() {
+    if (FEATS.length) return FEATS;
+    var out = [];
+    var lis = pro.querySelectorAll(".feat-list li");
+    for (var i = 0; i < lis.length && out.length < 3; i++) {
+      var all = lis[i].textContent.replace(/\s+/g, " ").trim();
+      if (/スマホ|HTMLファイル|パソコンで使う/.test(all)) continue;
+      var st = lis[i].querySelectorAll("strong");
+      var t = st.length === 1 ? st[0].textContent : all.split(/[::。]/)[0];
+      t = t.replace(/[((][^()()]*[))]/g, "").replace(/\s+/g, " ").trim();
+      if (t.length > 40) t = t.slice(0, 39) + "…";
+      if (t) out.push(t);
+    }
+    return out;
+  }
+  // 「〜してください」「できません」など、失敗の表示が出ていたら案内しない
+  function failed() {
+    var els = document.querySelectorAll('[role="status"], [role="alert"], [aria-live]');
+    for (var i = 0; i < els.length; i++) {
+      if (pro.contains(els[i]) || !els[i].offsetParent) continue;
+      if (/ください|できません|できませんでした|失敗|ありません|エラー/.test(els[i].textContent)) return true;
+    }
+    return false;
+  }
+  function proVisible() {
+    var r = pro.getBoundingClientRect();
+    return r.top < innerHeight && r.bottom > 0;
+  }
+  function show(trigger) {
+    if (!pc || blocked() || (trigger === "action" && failed()) || proVisible()) return;
+    var list = feats();
+    if (!list.length) return;
+    shown = true;
+    sess(KEY_SHOWN, "1");
+    var box = document.createElement("aside");
+    box.className = "upsell-toast";
+    box.setAttribute("aria-label", "買い切り版のご案内");
+    box.setAttribute("aria-live", "polite");
+    document.body.appendChild(box);
+    var p = document.createElement("p");
+    p.textContent = trigger === "limit"
+      ? "この先は買い切り版の機能です。パソコン用の買い切り版(¥100・税込)なら:"
+      : "うまくできましたか? パソコン用の買い切り版(¥100・税込)なら、さらに:";
+    var ul = document.createElement("ul");
+    list.forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+    var a = document.createElement("a");
+    a.className = "upsell-go";
+    a.id = "upsellToastLink";
+    a.href = buy.href;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = "BOOTHで見る(新しいタブ)";
+    var bg = getComputedStyle(buy).backgroundColor;
+    if (bg && !/rgba?\(0, 0, 0, 0\)|transparent/.test(bg)) a.style.background = bg;
+    var x = document.createElement("button");
+    x.type = "button";
+    x.className = "upsell-x";
+    x.setAttribute("aria-label", "この案内を閉じる");
+    x.textContent = "×";
+    function close(remember) {
+      if (box.parentNode) box.parentNode.removeChild(box);
+      document.removeEventListener("keydown", onKey);
+      if (remember) store(KEY_CLOSED, String(Date.now() + 7 * 864e5));
+    }
+    // Escはページ側の操作(選択解除など)にも使われるので、案内の中にフォーカスがある時だけ閉じる
+    function onKey(e) { if (e.key === "Escape" && box.contains(document.activeElement)) close(true); }
+    x.addEventListener("click", function () { close(true); });
+    a.addEventListener("click", function () { setTimeout(function () { close(false); }, 0); });
+    document.addEventListener("keydown", onKey);
+    setTimeout(function () {
+      var note = document.createElement("small");
+      note.className = "upsell-note";
+      note.textContent = "スマホではファイルを開けない機種があります";
+      box.appendChild(x); box.appendChild(p); box.appendChild(ul); box.appendChild(a); box.appendChild(note);
+    }, 50);
+    gtagEv("upsell_show", { trigger: trigger });
+  }
+
+  // 保存・コピー・印刷・書き出しを押した直後(結果を受け取れたタイミング)
+  var OK = /保存|コピー|印刷|書き出|ダウンロード|共有|PDF/;
+  var NG = /読み込|リセット|消|削除|このブラウザに保存|確認|イメージを見る|戻/;
+  document.addEventListener("click", function (e) {
+    var el = e.target && e.target.closest ? e.target.closest("button, a[download], input[type=button], input[type=submit]") : null;
+    if (!el || el.closest("#pro-section, .upsell-toast, #anshin")) return;
+    var label = (el.textContent || el.value || "").replace(/\s+/g, " ");
+    if (!OK.test(label) || NG.test(label)) return;
+    setTimeout(function () { show("action"); }, 1500);
+  }, true);
+
+  // 無料版の上限まわり
+  // (1) ページが出す「買い切り版」の一文に、購入欄へのリンクを足す(スマホでも)。🔒のタブは薄く表示されているので入れない
+  // (2) 案内(パソコンのみ)は、はっきりした合図のときだけ出す: 🔒のクリック・買い切り版にふれたalert・
+  //     初めて出た「〜まで/のみ/以降/入っていません」の上限の一文(計算のたびに出る誘導文や、同じ文の描き直しでは出さない)
+  var SKIP = "#pro-section, .upsell-toast, .upsell-top, #anshin, a, button, label, select, option, h1, h2, h3, .badge, header, footer, nav, textarea, pre, code, [contenteditable], svg";
+  var LIMIT = /まで|のみ|以降|入っていません/;
+  var seenText = {}, ready = false;
+  function goPro(e) {
+    if (e) e.preventDefault();
+    pro.setAttribute("tabindex", "-1");
+    pro.scrollIntoView({ behavior: "smooth", block: "start" });
+    pro.focus({ preventScroll: true });
+  }
+  function linkify(root, deep) {
+    var limitHit = false;
+    var els = root.matches("p, div, span, li") ? [root] : [];
+    if (deep) els = els.concat([].slice.call(root.querySelectorAll("p, div, span, li")));
+    els.forEach(function (el) {
+      if (el.closest(SKIP) || el.closest('[role="radio"], [role="option"], [role="tab"], [role="button"], [tabindex]:not([tabindex="-1"])') || el.querySelector("a, button, p, div, li, input, label")) return;
+      // 選択肢の「○○(買い切り版)」ではなく、文として買い切り版にふれている要素だけ
+      var own = "";
+      for (var n = el.firstChild; n; n = n.nodeType === 1 && n.className === "upsell-inline" ? null : n.nextSibling) if (n.nodeType === 3) own += n.nodeValue;
+      own = own.trim();
+      if (own.indexOf("買い切り版") < 0 || /[((]買い切り版[))]$/.test(own) || /^🔒/.test(own)) return;
+      var key = own.replace(/\d+/g, "#");
+      if (ready && !seenText[key] && LIMIT.test(own) && !el.closest(".teaser, #teaser, [id$=teaser], #tz")) limitHit = true;
+      seenText[key] = 1;
+      if (el.querySelector(".upsell-inline")) return;
+      var a = document.createElement("a");
+      a.className = "upsell-inline";
+      a.href = "#pro-section";
+      a.setAttribute("aria-label", "くわしく:買い切り版の説明へ移動");
+      a.textContent = "くわしく";
+      var ar = document.createElement("span");
+      ar.setAttribute("aria-hidden", "true");
+      ar.textContent = " ↓";
+      a.appendChild(ar);
+      a.addEventListener("click", goPro);
+      el.appendChild(document.createTextNode(" "));
+      el.appendChild(a);
+    });
+    return limitHit;
+  }
+  linkify(document.body, true);
+  setTimeout(function () { ready = true; }, 1500);
+  var topLink = document.querySelector("#upsellTop a");
+  if (topLink) topLink.addEventListener("click", goPro);
+  new MutationObserver(function (ms) {
+    // 変わったところだけを調べる(足された要素はその中も、文字の変更は親要素だけ)
+    var hit = false, done = new Set();
+    function check(t, deep) {
+      if (!t || t.nodeType !== 1 || done.has(t) || t.closest(".upsell-toast")) return;
+      done.add(t);
+      if (linkify(t, deep)) hit = true;
+    }
+    ms.forEach(function (m) {
+      if (m.type === "characterData") { check(m.target.parentNode, false); return; }
+      check(m.target, false);
+      for (var i = 0; i < m.addedNodes.length; i++) if (m.addedNodes[i].nodeType === 1) check(m.addedNodes[i], true);
+    });
+    if (hit) setTimeout(function () { show("limit"); }, 800);
+  }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  document.addEventListener("click", function (e) {
+    var el = e.target && e.target.closest ? e.target.closest("button, div, span, li") : null;
+    var first = el && el.firstChild && el.firstChild.nodeType === 3 ? el.firstChild.nodeValue : "";
+    if (!/^\s*🔒/.test(first) || e.target.closest("#pro-section")) return;
+    if (pc) setTimeout(function () { show("limit"); }, 300); else goPro();
+  }, true);
+  var origAlert = window.alert;
+  window.alert = function (msg) {
+    var r = origAlert.apply(window, arguments);
+    if (/買い切り版/.test(String(msg))) setTimeout(function () { show("limit"); }, 300);
+    return r;
+  };
+})();
+</script>
+<!--UPSELL_JS_END-->
+</body>
+</html>
